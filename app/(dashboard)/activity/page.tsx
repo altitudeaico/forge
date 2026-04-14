@@ -29,7 +29,7 @@ export default async function ActivityPage() {
   const supabase = createServerSupabaseClient()
   const profile = await getProfile()
 
-  const { data: activities } = await supabase
+  const { data: activitiesData } = await supabase
     .from('activities')
     .select(`
       *,
@@ -38,6 +38,8 @@ export default async function ActivityPage() {
     `)
     .order('created_at', { ascending: false })
     .limit(50)
+
+  const activities = activitiesData as any[] | null
 
   // Group activities by date
   const groupedActivities: Record<string, any[]> = {}
