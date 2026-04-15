@@ -11,15 +11,17 @@ interface Props {
 
 export default async function ProjectDetailPage({ params }: Props) {
   const supabase = createServerSupabaseClient()
-  const profile = await getProfile()
+  const profile = await getProfile() as { role: string } | null
   
   const canSeeCommercial = profile?.role === 'super_admin'
 
-  const { data: project } = await supabase
+  const { data: projectData } = await supabase
     .from('projects')
     .select('*')
     .eq('id', params.id)
     .single()
+
+  const project = projectData as any
 
   if (!project) {
     notFound()
@@ -27,17 +29,24 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   // Fetch related data
   const [
-    { data: tasks },
-    { data: milestones },
-    { data: activities },
-    { data: files },
-    { data: assignments }
+    { data: tasksData },
+    { data: milestonesData },
+    { data: activitiesData },
+    { data: filesData },
+    { data: assignmentsData }
   ] = await Promise.all([
     supabase.from('tasks').select('*').eq('project_id', params.id).order('sort_order'),
     supabase.from('milestones').select('*').eq('project_id', params.id).order('sort_order'),
     supabase.from('activities').select('*').eq('project_id', params.id).order('created_at', { ascending: false }).limit(10),
     supabase.from('files').select('*').eq('project_id', params.id).order('created_at', { ascending: false }),
     supabase.from('project_assignments').select('*, profiles(*)').eq('project_id', params.id)
+  ])
+
+  const tasks = tasksData as any[] | null
+  const milestones = milestonesData as any[] | null
+  const activities = activitiesData as any[] | null
+  const files = filesData as any[] | null
+  const assignments = assignmentsData as any[] | null
   ])
 
   const tasksByStatus = {

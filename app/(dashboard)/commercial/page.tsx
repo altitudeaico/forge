@@ -5,7 +5,7 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import Link from 'next/link'
 
 export default async function CommercialPage() {
-  const profile = await getProfile()
+  const profile = await getProfile() as { role: string } | null
   
   // Only super_admin can access
   if (profile?.role !== 'super_admin') {
@@ -14,10 +14,12 @@ export default async function CommercialPage() {
 
   const supabase = createServerSupabaseClient()
 
-  const { data: projects } = await supabase
+  const { data: projectsData } = await supabase
     .from('projects')
     .select('*')
     .order('updated_at', { ascending: false })
+
+  const projects = projectsData as any[] | null
 
   // Calculate metrics
   const totalRevenue = projects?.reduce((sum, p) => sum + (p.value_total || 0), 0) || 0

@@ -5,16 +5,18 @@ import Link from 'next/link'
 
 export default async function KnowledgePage() {
   const supabase = createServerSupabaseClient()
-  const profile = await getProfile()
+  const profile = await getProfile() as { role: string } | null
   
   const canEdit = profile?.role === 'super_admin' || profile?.role === 'admin'
 
-  const { data: categories } = await supabase
+  const { data: categoriesData } = await supabase
     .from('kb_categories')
     .select('*')
     .order('sort_order')
 
-  const { data: articles } = await supabase
+  const categories = categoriesData as any[] | null
+
+  const { data: articlesData } = await supabase
     .from('kb_articles')
     .select(`
       *,
@@ -22,6 +24,8 @@ export default async function KnowledgePage() {
     `)
     .eq('is_published', true)
     .order('updated_at', { ascending: false })
+
+  const articles = articlesData as any[] | null
 
   // Group articles by category
   const articlesByCategory: Record<string, any[]> = {}

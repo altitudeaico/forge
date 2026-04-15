@@ -6,15 +6,17 @@ import { NewProjectButton } from './NewProjectButton'
 
 export default async function ProjectsPage() {
   const supabase = createServerSupabaseClient()
-  const profile = await getProfile()
+  const profile = await getProfile() as { role: string } | null
   
   const canSeeCommercial = profile?.role === 'super_admin'
   const canCreate = profile?.role === 'super_admin' || profile?.role === 'admin'
 
-  const { data: projects } = await supabase
+  const { data: projectsData } = await supabase
     .from('projects')
     .select('*')
     .order('updated_at', { ascending: false })
+
+  const projects = projectsData as any[] | null
 
   return (
     <div>

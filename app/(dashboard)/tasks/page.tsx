@@ -5,9 +5,9 @@ import { TaskBoard } from './TaskBoard'
 
 export default async function TasksPage() {
   const supabase = createServerSupabaseClient()
-  const profile = await getProfile()
+  const profile = await getProfile() as { role: string } | null
 
-  const { data: tasks } = await supabase
+  const { data: tasksData } = await supabase
     .from('tasks')
     .select(`
       *,
@@ -16,10 +16,14 @@ export default async function TasksPage() {
     `)
     .order('sort_order')
 
-  const { data: projects } = await supabase
+  const tasks = tasksData as any[] | null
+
+  const { data: projectsData } = await supabase
     .from('projects')
     .select('id, name')
     .in('status', ['active', 'discovery'])
+
+  const projects = projectsData as any[] | null
 
   const tasksByStatus = {
     todo: tasks?.filter(t => t.status === 'todo') || [],

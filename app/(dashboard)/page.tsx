@@ -6,31 +6,37 @@ import Link from 'next/link'
 
 export default async function DashboardPage() {
   const supabase = createServerSupabaseClient()
-  const profile = await getProfile()
+  const profile = await getProfile() as { role: string } | null
   
   const canSeeCommercial = profile?.role === 'super_admin'
   
   // Fetch projects
-  const { data: projects } = await supabase
+  const { data: projectsData } = await supabase
     .from('projects')
     .select('*')
     .order('updated_at', { ascending: false })
     .limit(5)
 
+  const projects = projectsData as any[] | null
+
   // Fetch tasks
-  const { data: tasks } = await supabase
+  const { data: tasksData } = await supabase
     .from('tasks')
     .select('*, projects(name)')
     .neq('status', 'done')
     .order('due_date', { ascending: true })
     .limit(5)
 
+  const tasks = tasksData as any[] | null
+
   // Fetch recent activity
-  const { data: activities } = await supabase
+  const { data: activitiesData } = await supabase
     .from('activities')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(5)
+
+  const activities = activitiesData as any[] | null
 
   // Calculate stats
   const activeProjects = projects?.filter(p => p.status === 'active').length || 0

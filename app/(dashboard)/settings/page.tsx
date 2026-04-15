@@ -5,7 +5,7 @@ import { roleLabels, roleColors } from '@/lib/utils'
 import { InviteUserButton } from './InviteUserButton'
 
 export default async function SettingsPage() {
-  const profile = await getProfile()
+  const profile = await getProfile() as { role: string } | null
   
   // Only super_admin can access
   if (profile?.role !== 'super_admin') {
@@ -14,10 +14,12 @@ export default async function SettingsPage() {
 
   const supabase = createServerSupabaseClient()
 
-  const { data: users } = await supabase
+  const { data: usersData } = await supabase
     .from('profiles')
     .select('*')
     .order('created_at', { ascending: false })
+
+  const users = usersData as any[] | null
 
   return (
     <div>
