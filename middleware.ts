@@ -61,11 +61,11 @@ export async function middleware(request: NextRequest) {
   const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
 
   // Auth routes (redirect if already logged in)
-  const authPaths = ['/login', '/signup']
+  const authPaths = ['/auth/login', '/auth/signup']
   const isAuthPath = authPaths.some(path => request.nextUrl.pathname.startsWith(path))
 
   if (isProtectedPath && !session) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
   if (isAuthPath && session) {
