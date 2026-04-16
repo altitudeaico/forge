@@ -4,13 +4,11 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { MobileNav } from '@/components/layout/MobileNav'
 
-export default function DashboardLayout({
-  children,
-}: {
+interface DashboardShellProps {
   children: React.ReactNode
-}) {
-  // Profile will be fetched by each page that needs it
-  // Middleware handles auth protection
+}
+
+export function DashboardShell({ children }: DashboardShellProps) {
   const profile = { role: 'super_admin', full_name: 'User', email: '' } as any
 
   return (
@@ -21,7 +19,7 @@ export default function DashboardLayout({
         <Sidebar profile={profile} />
         
         <main className="flex-1 p-6 pb-24 md:pb-6 overflow-y-auto">
-          <div className="max-w-7xl mx-auto animate-fade-in">
+          <div className="max-w-7xl mx-auto">
             {children}
           </div>
         </main>
