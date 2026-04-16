@@ -47,7 +47,6 @@ export default async function ProjectDetailPage({ params }: Props) {
   const activities = activitiesData as any[] | null
   const files = filesData as any[] | null
   const assignments = assignmentsData as any[] | null
-  ])
 
   const tasksByStatus = {
     todo: tasks?.filter(t => t.status === 'todo') || [],
